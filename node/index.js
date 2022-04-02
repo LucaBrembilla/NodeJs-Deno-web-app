@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const app = express();
 
-mongoose.connect('mongodb://localhost/SpotAPY')
+mongoose.connect('mongodb://localhost/MusicAPI')
   .then(() => console.log('Connected to MongoDB...'))
   .catch(err => console.error('Could not connect to MongoDB...'));
 
