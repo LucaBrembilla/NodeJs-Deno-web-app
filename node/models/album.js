@@ -16,11 +16,11 @@ const albumSchema = new mongoose.Schema({
 	},
 	genre: {
 		type: [genreSchema],
-		required: true 
+		required: false 
 	},
 	numberOfSongs: {
-		type: int,
-		required: true
+		type: Number,
+		required: false
 	},
 	songs: {
 		type: [songSchema],
