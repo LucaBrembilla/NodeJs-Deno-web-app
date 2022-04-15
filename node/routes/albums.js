@@ -1,22 +1,22 @@
-const {Artist} = require("../models/artist");
+const {Album} = require("../models/song");
 const express = require("express");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-	const artists = await Artist.find().sort("alias").select("alias");
-	res.send(artists);
+	const albums = await Album.find().sort("realeaseDate");
+	res.send(albums);
 });
 
-router.post("/", async (req,res) => {
-	const artist = new Artist({ 
+/* router.post("/", async (req,res) => {
+	const album = new Artist({ 
 		alias: req.body.alias, 
 		real_name: req.body.real_name, 
 		real_surname: req.body.real_surname, 
 		band: req.body.band
 	});
-  await artist.save();
+  await album.save();
   
-  res.send(artist);
-});
+  res.send(album);
+}); */
 
 module.exports = router;
