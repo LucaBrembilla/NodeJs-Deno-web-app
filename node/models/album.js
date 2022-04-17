@@ -16,7 +16,7 @@ const albumSchema = new mongoose.Schema({
 	},
 	genre: {
 		type: [genreSchema],
-		required: false 
+		required: true 
 	},
 	numberOfSongs: {
 		type: Number,
@@ -26,7 +26,10 @@ const albumSchema = new mongoose.Schema({
 		type: [songSchema],
 		required: true
 	},
-	releaseDate: Date
+	releaseDate: {
+		type: Date,
+		required: true
+	}
 });
 
 const Album = mongoose.model("Album", albumSchema);

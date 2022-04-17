@@ -11,10 +11,10 @@ router.get("/", async (req, res) => {
 
 router.post("/", async (req, res) => {
 	let artist = await Artist.findById(req.body.artistId[0]);
-  if (!artist) return res.status(400).send('Invalid artist.');
+  if (!artist) return res.status(400).send("Invalid artist.");
 
   let genre = await Genre.findById(req.body.genreId[0]);
-  if (!genre) return res.status(400).send('Invalid genre.');
+  if (!genre) return res.status(400).send("Invalid genre.");
 
   let song = new Song({ 
 		title: req.body.title,
@@ -26,17 +26,17 @@ router.post("/", async (req, res) => {
       _id: genre._id,
       name: genre.name
     },
-		releaseDate: req.body.releaseDate
+		releaseDate: new Date(req.body.releaseDate)
   });
 	
 	for(let i = 1; i<req.body.genreId.length; i++){
 		genre = await Genre.findById(req.body.genreId[i]);
-		if (!genre) return res.status(400).send('Invalid genre.'); 
+		if (!genre) return res.status(400).send("Invalid genre."); 
 		song.genre.push({ _id: genre._id, name: genre.name });
 	}
 	for(let i = 1; i<req.body.artistId.length; i++){
 		artist = await Artist.findById(req.body.artistId[i]);
-		if (!artist) return res.status(400).send('Invalid artist.'); 
+		if (!artist) return res.status(400).send("Invalid artist."); 
 		song.artist.push({ _id: artist._id, alias: artist.alias });
 	}
   await song.save();
@@ -69,7 +69,7 @@ router.put('/:id', async (req, res) => {
 			_id: genre._id,
 			name: genre.name
 		},
-		releaseDate: req.body.releaseDate
+		releaseDate: new Date(req.body.releaseDate)
 	}, { new: true });
 	for(let i = 1; i<req.body.genreId.length; i++){
 		genre = await Genre.findById(req.body.genreId[i]);
