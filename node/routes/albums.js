@@ -36,7 +36,7 @@ router.post("/", async (req,res) => {
 			_id: genre._id,
 			name: genre.name
 		},
-		releaseDate: req.body.releaseDate
+		releaseDate: new Date(req.body.releaseDate)
 	});
 	for(let i = 1; i<req.body.genreId.length; i++){
 		genre = await Genre.findById(req.body.genreId[i]);
