@@ -1,5 +1,6 @@
 import { MongoClient } from "../deps.ts";
 import { GenreSchema } from "../models/genre.ts";
+import { ArtistSchema } from "../models/artist.ts";
 
 const client = new MongoClient();
 
@@ -10,4 +11,4 @@ await client.connect("mongodb://127.0.0.1:27017")
 const db = client.database("musicAPI");
 
 export const genresCollection = db.collection<GenreSchema>("genres");
-export const artistsCollection = db.collection("artists"); 
+export const artistsCollection = db.collection<ArtistSchema>("artists"); 

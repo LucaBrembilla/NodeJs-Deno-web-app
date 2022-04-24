@@ -25,5 +25,6 @@ export interface ArtistSchema {
 		required: false,
 		minlength: 1,
     maxlength: 50
-	}
+	},
+  _v: number
 }
