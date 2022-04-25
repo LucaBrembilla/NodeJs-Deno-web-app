@@ -1,6 +1,6 @@
 import { Router, Context } from "../deps.ts";
 import { genresCollection } from "../startup/db.ts";
-import { GenreSchema } from "../models/genre.ts";
+import { validateGenre } from "../models/genre.ts";
 
 const routerGenres = new Router;
 
@@ -19,7 +19,7 @@ routerGenres
 			_v: 0
 		};
 		
-		if( name === null || name === undefined || typeof name !== "string" || name.length<1 || name.length>50 ){
+		if(!validateGenre(genre)){
 			ctx.response.status = 400;
 			ctx.response.body = "You typed incorrect JSON";
 			return;

@@ -46,7 +46,7 @@ router.post("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
 	const song = await Song.findById(req.params.id);
-  if (!song) return res.status(404).send('The song with the given ID was not found.');
+  if (!song) return res.status(404).send("The song with the given ID was not found.");
   res.send(song);
 });
 
