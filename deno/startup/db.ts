@@ -15,3 +15,4 @@ export const genresCollection = db.collection<GenreSchema>("genres");
 export const artistsCollection = db.collection<ArtistSchema>("artists");
 //export const songsCollection = db.collection<SongSchema>("songs");
 export const songsCollection = db.collection("songs");
+export const albumsCollection = db.collection("albums");
