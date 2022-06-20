@@ -81,6 +81,7 @@ router.put('/:id', async (req, res) => {
 		if (!artist) return res.status(400).send('Invalid artist.'); 
 		song.artist.push({ _id: artist._id, alias: artist.alias });
 	}
+	song.__v++;
 	await song.save();
 
   if (!song) return res.status(404).send('The song with the given ID was not found.');
