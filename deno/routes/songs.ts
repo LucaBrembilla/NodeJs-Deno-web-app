@@ -1,4 +1,5 @@
 import { Router, Context, Bson } from "../deps.ts";
+import { validateInputSong } from "../models/song.ts";
 import { genresCollection, artistsCollection, songsCollection } from "../startup/db.ts";
 
 const routerSongs = new Router;
@@ -13,6 +14,12 @@ routerSongs
 	.post("/", async (ctx: Context) => {
 		const { value } = await ctx.request.body();
 		const { title, artistId, genreId, releaseDate } = await value;
+
+		if(!validateInputSong({ title, artistId, genreId, releaseDate })) {
+			ctx.response.status = 400;
+			ctx.response.body = "You typed incorrect JSON";
+			return;
+		}
 
 		let _id = Bson.ObjectId.createFromHexString(genreId[0]);
 		let genre = await genresCollection.findOne( { _id } );
@@ -41,7 +48,7 @@ routerSongs
 				name: genre.name
 			}],
 			releaseDate: releaseDate,
-			_v: 0
+			__v: 0
 		};
 		for(let i = 1; i<genreId.length; i++){
 			_id = Bson.ObjectId.createFromHexString(genreId[i]!) 
@@ -63,6 +70,12 @@ routerSongs
 			}
 			song.artist.push({_id: artist._id, alias: artist.alias});
 		}
+
+		/* if(!validateSong(song)){
+			ctx.response.status = 400;
+			ctx.response.body = "You typed incorrect JSON";
+			return;
+		} */
 
 		await songsCollection.insertOne(song);
 		ctx.response.status = 200;
@@ -86,29 +99,34 @@ routerSongs
 	.put("/:id", async ( ctx: Context ) => {
 		const { value } = await ctx.request.body();
 		const { title, artistId, genreId, releaseDate } = await value;
+
+		if(!validateInputSong({ title, artistId, genreId, releaseDate })) {
+			ctx.response.status = 400;
+			ctx.response.body = "You typed incorrect JSON";
+			return;
+		}
+
 		const str = ctx.request.url.pathname.split("/")[3];
 		try { 
 			let _id = Bson.ObjectId.createFromHexString(str);
 			let song = await songsCollection.findOne({ _id });
 			if(!song) throw new Error("Song not found");
 
-			let version = song.__v +1;
-			console.log(song);
-			await songsCollection.replaceOne( 
-				{ _id },
-				{ _id, title, artist: [], genre: [], releaseDate, __v:version}
-			);
-			song = await songsCollection.findOne({_id});
-			
+			song.__v++;
+			song.releaseDate = releaseDate;
+			song.title = title;
+			song.artist = [];
+			song.genre = [];
+
 			for(let i = 0; i<genreId.length; i++){
-				_id = Bson.ObjectId.createFromHexString(genreId[i]!) 
+				_id = Bson.ObjectId.createFromHexString(genreId[i]) 
 				let genre = await genresCollection.findOne( { _id } );
 				if (!genre){
 					ctx.response.status = 400;
 					ctx.response.body = "Invalid genre";
 					return;
 				}
-				song!.genre.push({_id: genre._id, name: genre.name});
+				song.genre.push({_id: genre._id, name: genre.name});
 			}
 			for(let i = 0; i<artistId.length; i++){
 				_id = Bson.ObjectId.createFromHexString( artistId[i] );
@@ -118,8 +136,13 @@ routerSongs
 					ctx.response.body = "Invalid artist";
 					return;
 				}
-				song!.artist.push({_id: artist._id, alias: artist.alias});
+				song.artist.push({_id: artist._id, alias: artist.alias});
 			}
+
+			await songsCollection.replaceOne( 
+				{ _id: song._id },
+				{ _id: song._id, title: song.title, artist: song.artist, genre: song.genre, releaseDate, __v: song.__v }
+			);
 			ctx.response.body = song;
 			ctx.response.status = 200;
 		}catch{
