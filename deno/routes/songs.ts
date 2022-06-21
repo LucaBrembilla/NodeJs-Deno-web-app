@@ -83,7 +83,6 @@ routerSongs
 		}
 	})
 
-	//TODO: inc _v
 	.put("/:id", async ( ctx: Context ) => {
 		const { value } = await ctx.request.body();
 		const { title, artistId, genreId, releaseDate } = await value;
@@ -93,13 +92,14 @@ routerSongs
 			let song = await songsCollection.findOne({ _id });
 			if(!song) throw new Error("Song not found");
 
+			let version = song.__v +1;
 			console.log(song);
 			await songsCollection.replaceOne( 
 				{ _id },
-				{ _id, title, artist: [], genre: [], releaseDate}
+				{ _id, title, artist: [], genre: [], releaseDate, __v:version}
 			);
 			song = await songsCollection.findOne({_id});
-
+			
 			for(let i = 0; i<genreId.length; i++){
 				_id = Bson.ObjectId.createFromHexString(genreId[i]!) 
 				let genre = await genresCollection.findOne( { _id } );

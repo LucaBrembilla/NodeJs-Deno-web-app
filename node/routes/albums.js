@@ -75,7 +75,8 @@ router.put('/:id', async (req, res) => {
 	let song = await Song.findById(req.body.songId[0]);
 	if (!song) return res.status(400).send("Invalid song.");
 
-  let album = new Album({ 
+  let album = await Album.findByIdAndUpdate( req.params.id, 
+	{ 
 		title: req.body.title,
 		artist: {
       _id: artist._id,
@@ -92,7 +93,9 @@ router.put('/:id', async (req, res) => {
       name: genre.name
 		},
 		releaseDate: new Date(req.body.releaseDate)
-	}, { new: true });
+	}, { new: true,  useFindAndModify: false });
+
+	if (!album) return res.status(404).send('The album with the given ID was not found.');
 	for(let i = 1; i<req.body.genreId.length; i++){
 		genre = await Genre.findById(req.body.genreId[i]);
 		if (!genre) return res.status(400).send('Invalid genre.'); 
@@ -108,9 +111,7 @@ router.put('/:id', async (req, res) => {
 		if (!song) return res.status(400).send('Invalid song.'); 
 		album.songs.push({ _id: song._id, title: song.title, genre: song.genre, artist: song.artist});
 	}
-	await song.save();
-
-  if (!album) return res.status(404).send('The album with the given ID was not found.');
+	await album.save();
   
   res.send(album);
 });
