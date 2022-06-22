@@ -4,13 +4,15 @@ const {Genre} = require("../models/genre");
 const {Album} = require("../models/album");
 const express = require("express");
 const router = express.Router();
+const auth = require("../middleware/auth");
+const admin = require("../middleware/admin");
 
 router.get("/", async (req, res) => {
 	const albums = await Album.find().sort("realeaseDate");
 	res.send(albums);
 });
 
-router.post("/", async (req,res) => {
+router.post("/", [auth, admin], async (req,res) => {
 	let artist = await Artist.findById(req.body.artistId[0]);
   if (!artist) return res.status(400).send("Invalid artist.");
 
@@ -65,7 +67,7 @@ router.get("/:id", async (req, res) => {
   res.send(album);
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
   let artist = await Artist.findById(req.body.artistId[0])
   if (!artist) return res.status(400).send('Invalid artist.');
 
@@ -116,7 +118,7 @@ router.put('/:id', async (req, res) => {
   res.send(album);
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', [auth, admin], async (req, res) => {
   const album = await Album.findByIdAndRemove(req.params.id);
   if (!album) return res.status(404).send('The album with the given ID was not found.');
   res.send(album);
