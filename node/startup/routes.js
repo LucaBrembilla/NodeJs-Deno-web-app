@@ -14,7 +14,7 @@ module.exports = function(app) {
   app.use("/api/artists", artists);
 	app.use("/api/albums", albums);
 	app.use("/api/songs", songs); 
-	//app.use("/api/users", users);
-	//app.use("/api/auth", auth);
+	app.use("/api/users", users);
+	app.use("/api/auth", auth);
 	app.use(error);
 }

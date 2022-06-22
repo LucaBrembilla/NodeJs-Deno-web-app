@@ -1,6 +1,7 @@
 import { Router, Context, Bson } from "../deps.ts";
 import { genresCollection } from "../startup/db.ts";
 import { validateGenre } from "../models/genre.ts";
+import { auth } from "../middleware/auth.ts";
 
 const routerGenres = new Router;
 
@@ -22,6 +23,10 @@ routerGenres
 		if(!validateGenre(genre)){
 			ctx.response.status = 400;
 			ctx.response.body = "You typed incorrect JSON";
+			return;
+		}
+
+		if( ! await auth(ctx) ){
 			return;
 		}
 
