@@ -2,6 +2,7 @@ import { MongoClient } from "../deps.ts";
 import { GenreSchema } from "../models/genre.ts";
 import { ArtistSchema } from "../models/artist.ts";
 import { SongSchema } from "../models/song.ts";
+import { AlbumSchema } from "../models/album.ts";
 
 const client = new MongoClient();
 
@@ -14,5 +15,4 @@ const db = client.database("musicAPI");
 export const genresCollection = db.collection<GenreSchema>("genres");
 export const artistsCollection = db.collection<ArtistSchema>("artists");
 export const songsCollection = db.collection<SongSchema>("songs");
-//export const songsCollection = db.collection("songs");
-export const albumsCollection = db.collection("albums");
+export const albumsCollection = db.collection<AlbumSchema>("albums");

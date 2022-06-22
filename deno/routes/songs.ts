@@ -71,12 +71,6 @@ routerSongs
 			song.artist.push({_id: artist._id, alias: artist.alias});
 		}
 
-		/* if(!validateSong(song)){
-			ctx.response.status = 400;
-			ctx.response.body = "You typed incorrect JSON";
-			return;
-		} */
-
 		await songsCollection.insertOne(song);
 		ctx.response.status = 200;
 		ctx.response.body = song;

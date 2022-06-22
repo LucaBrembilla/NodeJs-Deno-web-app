@@ -9,7 +9,7 @@ export interface SongSchema {
 	__v: number
 }
 
-export function validateInputSong(songInput: {title: String, artistId: Object, genreId: Array<String>, releaseDate: String }){
+export function validateInputSong(songInput: {title: String, artistId: Array<String>, genreId: Array<String>, releaseDate: String }){
   if( songInput.title === null || songInput.title === undefined || typeof songInput.title !== "string" || songInput.title.length<1 || songInput.title.length>50 )
 		return false;
 	
@@ -22,3 +22,4 @@ export function validateInputSong(songInput: {title: String, artistId: Object, g
 
   return true;
 } 
+
