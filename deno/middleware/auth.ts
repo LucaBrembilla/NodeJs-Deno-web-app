@@ -11,6 +11,7 @@ export async function auth(ctx: Context ){
 	}
 	try{
 		const decoded = await verify(token, key);
+		ctx.state.user = decoded;
 		return true;
 	}catch (ex){
 		ctx.response.status = 401;

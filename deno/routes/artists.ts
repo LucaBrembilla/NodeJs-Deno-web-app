@@ -1,4 +1,6 @@
 import { Router, Context, Bson } from "../deps.ts";
+import { admin } from "../middleware/admin.ts";
+import { auth } from "../middleware/auth.ts";
 import { validateArtist } from "../models/artist.ts";
 import { artistsCollection } from "../startup/db.ts";
 
@@ -12,6 +14,13 @@ routerArtists
 	.post("/", async (ctx : Context) => {
 		const { value } = await ctx.request.body();
 		const { alias, real_name, real_surname, band } = await value;
+		
+		if( ! await auth(ctx) )
+			return;
+		
+		if( ! await admin(ctx) )
+			return;
+
 		const artist = {
 			alias: alias,
 			real_name: real_name,
@@ -34,6 +43,10 @@ routerArtists
 		const { value } = await ctx.request.body();
 		const { alias, real_name, real_surname, band } = await value;
 		const str = ctx.request.url.pathname.split("/")[3];
+		
+		if( ! await auth(ctx) )
+			return;
+		
 		try { 
 			let _id = Bson.ObjectId.createFromHexString(str);
 			let artist = await artistsCollection.findOne({ _id });
@@ -62,6 +75,13 @@ routerArtists
 
 	.delete("/:id", async ( ctx: Context ) => {
 		const str = ctx.request.url.pathname.split("/")[3];
+
+		if( ! await auth(ctx) )
+			return;
+		
+		if( ! await admin(ctx) )
+			return;
+
 		try { 
 			const _id = Bson.ObjectId.createFromHexString(str); 
 			const artist = await artistsCollection.findOne( { _id });

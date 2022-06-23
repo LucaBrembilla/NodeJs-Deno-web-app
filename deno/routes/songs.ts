@@ -1,6 +1,8 @@
 import { Router, Context, Bson } from "../deps.ts";
 import { validateInputSong } from "../models/song.ts";
 import { genresCollection, artistsCollection, songsCollection } from "../startup/db.ts";
+import { auth } from "../middleware/auth.ts";
+import { admin } from "../middleware/admin.ts";
 
 const routerSongs = new Router;
 
@@ -14,6 +16,12 @@ routerSongs
 	.post("/", async (ctx: Context) => {
 		const { value } = await ctx.request.body();
 		const { title, artistId, genreId, releaseDate } = await value;
+
+		if( ! await auth(ctx) )
+			return;
+		
+		if( ! await admin(ctx) )
+			return;
 
 		if(!validateInputSong({ title, artistId, genreId, releaseDate })) {
 			ctx.response.status = 400;
@@ -94,6 +102,9 @@ routerSongs
 		const { value } = await ctx.request.body();
 		const { title, artistId, genreId, releaseDate } = await value;
 
+		if( ! await auth(ctx) )
+			return;
+
 		if(!validateInputSong({ title, artistId, genreId, releaseDate })) {
 			ctx.response.status = 400;
 			ctx.response.body = "You typed incorrect JSON";
@@ -147,6 +158,13 @@ routerSongs
 
 	.delete("/:id", async ( ctx: Context ) => {
 		const str = ctx.request.url.pathname.split("/")[3];
+
+		if( ! await auth(ctx) )
+			return;
+		
+		if( ! await admin(ctx) )
+			return;
+
 		try { 
 			const _id = Bson.ObjectId.createFromHexString(str); 
 			const song = await songsCollection.findOne( { _id });

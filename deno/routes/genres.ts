@@ -2,6 +2,7 @@ import { Router, Context, Bson } from "../deps.ts";
 import { genresCollection } from "../startup/db.ts";
 import { validateGenre } from "../models/genre.ts";
 import { auth } from "../middleware/auth.ts";
+import { admin } from "../middleware/admin.ts";
 
 const routerGenres = new Router;
 
@@ -26,9 +27,11 @@ routerGenres
 			return;
 		}
 
-		if( ! await auth(ctx) ){
+		if( ! await auth(ctx) )
 			return;
-		}
+		
+		if( ! await admin(ctx) )
+			return;
 
 		await genresCollection.insertOne(genre);
 		ctx.response.status = 200;
@@ -38,6 +41,10 @@ routerGenres
 		const { value } = await ctx.request.body();
 		const { name } = await value;
 		const str = ctx.request.url.pathname.split("/")[3];
+
+		if( ! await auth(ctx) )
+			return;
+
 		try { 
 			let _id = Bson.ObjectId.createFromHexString(str);
 			let genre = await genresCollection.findOne({ _id });
@@ -66,6 +73,13 @@ routerGenres
 
 	.delete("/:id", async ( ctx: Context ) => {
 		const str = ctx.request.url.pathname.split("/")[3];
+		
+		if( ! await auth(ctx) )
+			return;
+		
+		if( ! await admin(ctx) )
+			return;
+
 		try { 
 			const _id = Bson.ObjectId.createFromHexString(str); 
 			const genre = await genresCollection.findOne( { _id });

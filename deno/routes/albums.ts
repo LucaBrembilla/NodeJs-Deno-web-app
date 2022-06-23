@@ -1,4 +1,6 @@
 import { Router, Context, Bson } from "../deps.ts";
+import { admin } from "../middleware/admin.ts";
+import { auth } from "../middleware/auth.ts";
 import { validateInputAlbum } from "../models/album.ts";
 import { genresCollection, artistsCollection, songsCollection, albumsCollection } from "../startup/db.ts";
 
@@ -14,6 +16,12 @@ routerAlbums
 	.post("/", async (ctx: Context) => {
 		const { value } = await ctx.request.body();
 		const { title, artistId, genreId, songId, releaseDate, numberOfSongs } = await value;
+
+		if( ! await auth(ctx) )
+			return;
+		
+		if( ! await admin(ctx) )
+			return;
 
 		if(!validateInputAlbum({ title, artistId, genreId, songId, releaseDate, numberOfSongs })) {
 			ctx.response.status = 400;
@@ -119,6 +127,9 @@ routerAlbums
 	.put("/:id", async ( ctx: Context ) => {
 		const { value } = await ctx.request.body();
 		const { title, artistId, genreId, songId, releaseDate, numberOfSongs } = await value;
+		
+		if( ! await auth(ctx) )
+			return;
 
 		if(!validateInputAlbum({ title, artistId, genreId, songId, releaseDate, numberOfSongs })) {
 			ctx.response.status = 400;
@@ -184,6 +195,13 @@ routerAlbums
 
 	.delete("/:id", async ( ctx: Context ) => {
 		const str = ctx.request.url.pathname.split("/")[3];
+		
+		if( ! await auth(ctx) )
+			return;
+		
+		if( ! await admin(ctx) )
+			return;
+
 		try { 
 			const _id = Bson.ObjectId.createFromHexString(str); 
 			const album = await albumsCollection.findOne( { _id });
