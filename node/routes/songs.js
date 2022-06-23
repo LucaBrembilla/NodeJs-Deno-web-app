@@ -27,8 +27,7 @@ router.post("/", [auth, admin], async (req, res) => {
     genre: {
       _id: genre._id,
       name: genre.name
-    },
-		releaseDate: new Date(req.body.releaseDate)
+    }
   });
 	
 	for(let i = 1; i<req.body.genreId.length; i++){
@@ -41,6 +40,9 @@ router.post("/", [auth, admin], async (req, res) => {
 		if (!artist) return res.status(400).send("Invalid artist."); 
 		song.artist.push({ _id: artist._id, alias: artist.alias });
 	}
+	if (req.body.releaseDate)
+		song.releaseDate = new Date(req.body.releaseDate);
+
   await song.save();
   
   res.send(song);
@@ -70,8 +72,7 @@ router.put('/:id', auth, async (req, res) => {
 		genre: {
 			_id: genre._id,
 			name: genre.name
-		},
-		releaseDate: new Date(req.body.releaseDate)
+		}
 	}, { new: true });
 	for(let i = 1; i<req.body.genreId.length; i++){
 		genre = await Genre.findById(req.body.genreId[i]);
@@ -84,6 +85,9 @@ router.put('/:id', auth, async (req, res) => {
 		song.artist.push({ _id: artist._id, alias: artist.alias });
 	}
 	song.__v++;
+	if (req.body.releaseDate)
+		song.releaseDate = new Date(req.body.releaseDate);
+
 	await song.save();
 
   if (!song) return res.status(404).send('The song with the given ID was not found.');
